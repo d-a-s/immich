@@ -1096,6 +1096,7 @@
   "role": "Role",
   "role_editor": "Editor",
   "role_viewer": "Viewer",
+  "rotate_image": "Rotate Image",
   "save": "Save",
   "saved_api_key": "Saved API Key",
   "saved_profile": "Saved profile",
