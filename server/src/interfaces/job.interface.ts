@@ -166,6 +166,7 @@ export interface ISidecarWriteJob extends IEntityJob {
   dateTimeOriginal?: string;
   latitude?: number;
   longitude?: number;
+  orientation?: string;
   rating?: number;
   tags?: true;
 }

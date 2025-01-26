@@ -11,7 +11,7 @@
   import { isWebCompatibleImage, canCopyImageToClipboard, copyImageToClipboard } from '$lib/utils/asset-utils';
   import { getBoundingBox } from '$lib/utils/people-utils';
   import { getAltText } from '$lib/utils/thumbnail-util';
-  import { AssetMediaSize, AssetTypeEnum, type AssetResponseDto, type SharedLinkResponseDto } from '@immich/sdk';
+  import { updateAsset, AssetMediaSize, AssetTypeEnum, type AssetResponseDto, type SharedLinkResponseDto } from '@immich/sdk';
   import { onDestroy, onMount } from 'svelte';
   import { t } from 'svelte-i18n';
   import { type SwipeCustomEvent, swipe } from 'svelte-gestures';
@@ -109,8 +109,12 @@
     $zoomed = $zoomed ? false : true;
   };
 
+  const orientations = ['1', '6', '8', '3'];
   rotateToggle = () => {
     $rotated = ($rotated + 1) % 4;
+    const orientation = orientations[$rotated];
+    updateAsset({ id: asset.id, updateAssetDto: { orientation } })
+      .catch((error) => handleError(error, $t('errors.cant_apply_changes')));
   };
 
   const onCopyShortcut = (event: KeyboardEvent) => {

@@ -54,6 +54,7 @@ export class AssetRepository implements IAssetRepository {
 
   async upsertExif(exif: Insertable<Exif>): Promise<void> {
     const value = { ...exif, assetId: asUuid(exif.assetId) };
+    console.log('upsertExif', exif);
     await this.db
       .insertInto('exif')
       .values(value)

@@ -274,6 +274,15 @@ describe(AssetService.name, () => {
       expect(assetMock.upsertExif).toHaveBeenCalledWith({ assetId: 'asset-1', rating: 3 });
     });
 
+    it('should update the exif orientation', async () => {
+      accessMock.asset.checkOwnerAccess.mockResolvedValue(new Set(['asset-1']));
+      assetMock.getById.mockResolvedValueOnce(assetStub.image);
+      assetMock.update.mockResolvedValueOnce(assetStub.image);
+
+      await sut.update(authStub.admin, 'asset-1', { orientation: '6' });
+      expect(assetMock.upsertExif).toHaveBeenCalledWith({ assetId: 'asset-1', orientation: '6' });
+    });
+
     it('should fail linking a live video if the motion part could not be found', async () => {
       accessMock.asset.checkOwnerAccess.mockResolvedValue(new Set([assetStub.livePhotoStillAsset.id]));
 

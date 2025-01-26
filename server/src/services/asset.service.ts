@@ -106,7 +106,8 @@ export class AssetService extends BaseService {
   async update(auth: AuthDto, id: string, dto: UpdateAssetDto): Promise<AssetResponseDto> {
     await this.requireAccess({ auth, permission: Permission.ASSET_UPDATE, ids: [id] });
 
-    const { description, dateTimeOriginal, latitude, longitude, rating, ...rest } = dto;
+    const { description, dateTimeOriginal, latitude, longitude, orientation, rating, ...rest } = dto;
+
     const repos = { asset: this.assetRepository, event: this.eventRepository };
 
     let previousMotion: AssetEntity | null = null;
@@ -119,7 +120,7 @@ export class AssetService extends BaseService {
       }
     }
 
-    await this.updateMetadata({ id, description, dateTimeOriginal, latitude, longitude, rating });
+    await this.updateMetadata({ id, description, dateTimeOriginal, latitude, longitude, orientation, rating });
 
     const asset = await this.assetRepository.update({ id, ...rest });
 
@@ -283,8 +284,9 @@ export class AssetService extends BaseService {
   }
 
   private async updateMetadata(dto: ISidecarWriteJob) {
-    const { id, description, dateTimeOriginal, latitude, longitude, rating } = dto;
-    const writes = _.omitBy({ description, dateTimeOriginal, latitude, longitude, rating }, _.isUndefined);
+    const { id, description, dateTimeOriginal, latitude, longitude, orientation, rating } = dto;
+    const writes = _.omitBy({ description, dateTimeOriginal, latitude, longitude, orientation, rating }, _.isUndefined);
+    console.log('updateMetadata', id, writes, dto);
     if (Object.keys(writes).length > 0) {
       await this.assetRepository.upsertExif({ assetId: id, ...writes });
       await this.jobRepository.queue({ name: JobName.SIDECAR_WRITE, data: { id, ...writes } });

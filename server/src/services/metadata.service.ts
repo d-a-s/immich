@@ -278,7 +278,7 @@ export class MetadataService extends BaseService {
 
   @OnJob({ name: JobName.SIDECAR_WRITE, queue: QueueName.SIDECAR })
   async handleSidecarWrite(job: JobOf<JobName.SIDECAR_WRITE>): Promise<JobStatus> {
-    const { id, description, dateTimeOriginal, latitude, longitude, rating, tags } = job;
+    const { id, description, dateTimeOriginal, latitude, longitude, orientation, rating, tags } = job;
     const [asset] = await this.assetRepository.getByIds([id], { tags: true });
     if (!asset) {
       return JobStatus.FAILED;
@@ -294,6 +294,7 @@ export class MetadataService extends BaseService {
         DateTimeOriginal: dateTimeOriginal,
         GPSLatitude: latitude,
         GPSLongitude: longitude,
+        Orientation: orientation?.match(/^\d+$/) && parseInt(orientation),
         Rating: rating,
         TagsList: tags ? tagsList : undefined,
       },
@@ -303,13 +304,13 @@ export class MetadataService extends BaseService {
     if (Object.keys(exif).length === 0) {
       return JobStatus.SKIPPED;
     }
-
     await this.metadataRepository.writeTags(sidecarPath, exif);
 
     if (!asset.sidecarPath) {
       await this.assetRepository.update({ id, sidecarPath });
     }
 
+    console.log('writing tags', exif);
     return JobStatus.SUCCESS;
   }
 
@@ -330,7 +331,10 @@ export class MetadataService extends BaseService {
     const mediaTags = await this.metadataRepository.readTags(asset.originalPath);
     const sidecarTags = asset.sidecarPath ? await this.metadataRepository.readTags(asset.sidecarPath) : {};
     const videoTags = asset.type === AssetType.VIDEO ? await this.getVideoTags(asset.originalPath) : {};
-
+    console.log('exif', { 
+      m: mediaTags.Orientation, 
+      s: sidecarTags.Orientation, 
+    });
     // prefer dates from sidecar tags
     const sidecarDate = firstDateTime(sidecarTags as Tags, EXIF_DATE_TAGS);
     if (sidecarDate) {

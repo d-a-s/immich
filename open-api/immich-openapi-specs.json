@@ -7949,6 +7949,15 @@
           "longitude": {
             "type": "number"
           },
+          "orientation": {
+            "enum": [
+              "1",
+              "6",
+              "8",
+              "3"
+            ],
+            "type": "string"
+          },
           "rating": {
             "maximum": 5,
             "minimum": 0,
@@ -12777,6 +12786,15 @@
           },
           "longitude": {
             "type": "number"
+          },
+          "orientation": {
+            "enum": [
+              "1",
+              "6",
+              "8",
+              "3"
+            ],
+            "type": "string"
           },
           "rating": {
             "maximum": 5,
